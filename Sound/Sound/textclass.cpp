@@ -8,11 +8,13 @@ TextClass::TextClass()
 {
 	m_Font = 0;
 	m_FontShader = 0;
-
+	m_Model = 0;
 	m_sentence1 = 0;
 	m_sentence2 = 0;
 	m_sentence3 = 0;
 	m_sentence4 = 0;
+	m_sentence5 = 0;
+	m_sentence6 = 0;
 }
 
 
@@ -35,7 +37,6 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	// Store the screen width and height.
 	m_screenWidth = screenWidth;
 	m_screenHeight = screenHeight;
-
 	// Store the base view matrix.
 	m_baseViewMatrix = baseViewMatrix;
 
@@ -93,6 +94,16 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	{
 		return false;
 	}
+	result = InitializeSentence(&m_sentence5, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+	result = InitializeSentence(&m_sentence6, 32, device);
+	if (!result)
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -105,6 +116,8 @@ void TextClass::Shutdown()
 	ReleaseSentence(&m_sentence2);
 	ReleaseSentence(&m_sentence3);
 	ReleaseSentence(&m_sentence4);
+	ReleaseSentence(&m_sentence5);
+	ReleaseSentence(&m_sentence6);
 
 	// Release the font shader object.
 	if(m_FontShader)
@@ -130,7 +143,7 @@ bool TextClass::Render(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix,
 {
 	bool result;
 
-
+	
 	// Draw the first sentences.
 	result = RenderSentence(deviceContext, m_sentence1, worldMatrix, orthoMatrix);
 	if(!result)
@@ -156,6 +169,17 @@ bool TextClass::Render(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix,
 		return false;
 	}
 
+	result = RenderSentence(deviceContext, m_sentence5, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence6, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -509,6 +533,78 @@ bool TextClass::SetMousePosition(int mouseX, int mouseY, ID3D11DeviceContext* de
 	{
 		return false;
 	}
+
+	return true;
+}
+
+bool TextClass::SetScreenResolution(int m_screenWidth, int m_screenHeight, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[16];
+	char screenString[16];
+	bool result;
+
+	_itoa_s(m_screenWidth, tempString, 10);
+
+	strcpy_s(screenString, "Size= ");
+	strcat_s(screenString, tempString);
+
+	result = UpdateSentence(m_sentence3, screenString, 20, 60, 1.0f, 1.0f, 1.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	_itoa_s(m_screenHeight, tempString, 10);
+
+	strcpy_s(screenString, "X ");
+	strcat_s(screenString, tempString);
+	result = UpdateSentence(m_sentence4, screenString, 80, 60, 1.0f, 1.0f, 1.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetObj(int m_objCount, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[16];
+	char ObjString[16];
+	bool result;
+
+	_itoa_s(m_objCount, tempString, 10);
+
+	strcpy_s(ObjString, "NumOfObj = ");
+	strcat_s(ObjString, tempString);
+
+	result = UpdateSentence(m_sentence5, ObjString, 20, 80, 1.0f, 1.0f, 1.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+
+	return true;
+}
+
+bool TextClass::SetPoly(int m_polyCount, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[32];
+	char PolyString[32];
+	bool result;
+
+	_itoa_s(m_polyCount, tempString, 10);
+
+	strcpy_s(PolyString, "NumOfPoly = ");
+	strcat_s(PolyString, tempString);
+
+	result = UpdateSentence(m_sentence6, PolyString, 20, 100, 1.0f, 1.0f, 1.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
 
 	return true;
 }

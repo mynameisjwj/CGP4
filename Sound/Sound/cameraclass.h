@@ -26,7 +26,7 @@ public:
 
 	void SetPosition(float, float, float);
 	void SetRotation(float, float, float);
-
+	XMFLOAT3 XMVectorToXMFLOAT3(XMVECTOR);
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
 	XMVECTOR position;

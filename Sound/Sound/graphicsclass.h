@@ -39,31 +39,32 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
+	void SetTitle();
 	bool Frame();
 	bool Frame(int, int, int, int);
-	void setAmbient();
-	void setAmbient_off();
-	void setDiffuse();
-	void setDiffuse_off();
-	void setSpeculer();
-	void setSpeculer_off();
-	void setColor(char);
-	bool isAmbient = false;
-	bool isDiffuse = false;
-	bool isSpeculer = false;
+	bool isEnter = false;
+	XMMATRIX Getbase();
 	CameraClass* m_Camera;
+
 private:
 	bool Render(float);
 
 private:
+
+	XMMATRIX baseViewMatrix;
 	D3DClass* m_D3D;
-	ModelClass* m_Model;
+	ModelClass* m_NormalWall;
+	ModelClass* m_Bird;
+	ModelClass* m_LongWall;
 	ModelClass* m_Floor;
+	ModelClass* m_Model;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 	LightClass* m_Plight;
 	TextureShaderClass* m_TextureShader;
 	BitmapClass* m_Bitmap;
+	BitmapClass* m_Title;
+	ModelClass* m_Pin;
 
 	TextClass* m_Text;
 };

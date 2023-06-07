@@ -8,7 +8,7 @@ CameraClass::CameraClass()
 {
 	m_position.x = 0.0f;
 	m_position.y = 0.0f;
-	m_position.z = -10.0f;
+	m_position.z = -15.0f;
 
 	m_rotation.x = 0.0f;
 	m_rotation.y = 0.0f;
@@ -89,21 +89,30 @@ void CameraClass::Render()
 	position += moveLeftRight * camRight;
 	position += moveBackForward * camForward;
 
-
+	
 	moveLeftRight = 0.0f;
 	moveBackForward = 0.0f;
 
+	
 	// Translate the rotated camera position to the location of the viewer.
 	lookAt = position + lookAt;
 
 	// Finally create the view matrix from the three updated vectors.
 	m_viewMatrix = XMMatrixLookAtLH(position, lookAt, up);
 
-	return;
+	m_position = XMVectorToXMFLOAT3(position);
+
 }
 
 
 void CameraClass::GetViewMatrix(XMMATRIX& viewMatrix)
 {
 	viewMatrix = m_viewMatrix;
+}
+
+XMFLOAT3 CameraClass::XMVectorToXMFLOAT3(XMVECTOR vector)
+{
+	XMFLOAT3 result;
+	XMStoreFloat3(&result, vector);
+	return result;
 }

@@ -27,7 +27,6 @@ SystemClass::~SystemClass()
 
 bool SystemClass::Initialize()
 {
-	int screenWidth, screenHeight;
 	bool result;
 
 
@@ -110,12 +109,7 @@ bool SystemClass::Initialize()
 	}
 
 	// Initialize the sound object.
-	result = m_Sound->Initialize(m_hwnd);
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize Direct Sound.", L"Error", MB_OK);
-		return false;
-	}
+	
 
 	return true;
 }
@@ -229,7 +223,7 @@ bool SystemClass::Frame()
 {
 	bool result;
 	int mouseX, mouseY;
-	float speed = 0.05f;
+	float speed = 0.1f;
 	m_Timer->Frame();
 	m_Fps->Frame();
 	m_Cpu->Frame();
@@ -246,25 +240,29 @@ bool SystemClass::Frame()
 	{
 		return false;
 	}
-	
-	// Get the location of the mouse from the input object,
-	m_Input->GetMouseLocation(mouseX, mouseY);
-	if (m_Input->IsKeyDown('A'))
+	if (m_Input->IsAPressed())
 	{
 		m_Graphics->m_Camera->moveLeftRight -= speed;
 	}
-	if (m_Input->IsKeyDown('D'))
+	if (m_Input->IsDPressed())
 	{
 		m_Graphics->m_Camera->moveLeftRight += speed;
 	}
-	if (m_Input->IsKeyDown('W'))
+	if (m_Input->IsWPressed())
 	{
 		m_Graphics->m_Camera->moveBackForward += speed;
 	}
-	if (m_Input->IsKeyDown('S'))
+	if (m_Input->IsSPressed())
 	{
 		m_Graphics->m_Camera->moveBackForward -= speed;
 	}
+	if (m_Input->IsEnterPressed())
+	{
+		m_Graphics->isEnter = true;
+	}
+	// Get the location of the mouse from the input object,
+	m_Input->GetMouseLocation(mouseX, mouseY);
+	
 	if ((m_Input->m_mouseState.lX != m_Input->mouseLastState.lX) || (m_Input->m_mouseState.lY != m_Input->mouseLastState.lY))
 	{
 		m_Graphics->m_Camera->yaw += m_Input->m_mouseState.lX * 0.001f;
@@ -274,7 +272,7 @@ bool SystemClass::Frame()
 		m_Input->mouseLastState = m_Input->m_mouseState;
 	}
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), mouseX, mouseY);
+	result = m_Graphics->Frame(m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), screenWidth, screenHeight);
 	if (!result)
 	{
 		return false;

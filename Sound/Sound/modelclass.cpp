@@ -14,6 +14,7 @@ ModelClass::ModelClass()
 	m_textureCount = 0;
 	m_normalCount = 0;
 	m_faceCount = 0;
+	m_objCount = 0;
 }
 
 
@@ -45,6 +46,8 @@ bool ModelClass::Initialize(ID3D11Device* device, const WCHAR* modelFilename, co
 		return false;
 	}
 
+	
+
 	// Load the texture for this model.
 	result = LoadTexture(device, textureFilename);
 	if(!result)
@@ -55,6 +58,92 @@ bool ModelClass::Initialize(ID3D11Device* device, const WCHAR* modelFilename, co
 	return true;
 }
 
+bool ModelClass::InitializeBird(ID3D11Device* device, const WCHAR* modelFilename, const WCHAR* textureFilename)
+{
+	bool result;
+
+	// Load in the model data,
+	result = LoadModel(modelFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Initialize the vertex and index buffers.
+	result = InitializeBuffersBird(device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Load the texture for this model.
+	result = LoadTexture(device, textureFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+bool ModelClass::InitializeGround(ID3D11Device* device, const WCHAR* modelFilename, const WCHAR* textureFilename)
+{
+	bool result;
+
+	// Load in the model data,
+	result = LoadModel(modelFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Initialize the vertex and index buffers.
+	result = InitializeBuffersGround(device);
+	if (!result)
+	{
+		return false;
+	}
+
+
+
+	// Load the texture for this model.
+	result = LoadTexture(device, textureFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool ModelClass::InitializeLong(ID3D11Device* device, const WCHAR* modelFilename, const WCHAR* textureFilename)
+{
+	bool result;
+
+	// Load in the model data,
+	result = LoadModel(modelFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Initialize the vertex and index buffers.
+	result = InitializeBuffersLong(device);
+	if (!result)
+	{
+		return false;
+	}
+
+
+
+	// Load the texture for this model.
+	result = LoadTexture(device, textureFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
 
 void ModelClass::Shutdown()
 {
@@ -88,6 +177,11 @@ int ModelClass::GetVertexCount()
 int ModelClass::GetInstanceCount()
 {
 	return m_instanceCount;
+}
+
+int ModelClass::GetFaceCount()
+{
+	return m_faceCount;
 }
 
 int ModelClass::GetIndexCount()
@@ -176,24 +270,24 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 		return false;
 	}
 
-	m_instanceCount = 10;
-
+	m_instanceCount = 1;
+	m_objCount += m_instanceCount;
 	instances = new InstanceType[m_instanceCount];
 	if (!instances)
 	{
 		return false;
 	}
 
-	instances[0].position = XMFLOAT3(-3.0f, 0.0f, 0.0f);
-	instances[1].position = XMFLOAT3(-3.0f, 1.5f, -1.0f);
-	instances[2].position = XMFLOAT3(-2.0f, -1.5f, 0.0f);
-	instances[3].position = XMFLOAT3(-2.0f, -3.0f, 3.0f);
-	instances[4].position = XMFLOAT3(-1.0f, -1.5f, 1.0f);
-	instances[5].position = XMFLOAT3(-1.0f, 1.5f, 1.0f);
-	instances[6].position = XMFLOAT3(0.0f, -1.5f, 1.0f);
-	instances[7].position = XMFLOAT3(0.0f, 1.0f, 2.0f);
-	instances[8].position = XMFLOAT3(1.0f, -1.5f, -2.0f);
-	instances[9].position = XMFLOAT3(1.0f, 1.5f, 0.0f);
+	instances[0].position = XMFLOAT3(10.0f, -4.5f, -10.0f);
+	/*instances[1].position = XMFLOAT3(-3.0f, -5.0f, -1.0f);
+	instances[2].position = XMFLOAT3(-2.0f, -5.0f, 0.0f);
+	instances[3].position = XMFLOAT3(-2.0f, -5.0f, 3.0f);
+	instances[4].position = XMFLOAT3(-1.0f, -5.0f, 1.0f);
+	instances[5].position = XMFLOAT3(-1.0f, -5.0f, 1.0f);
+	instances[6].position = XMFLOAT3(0.0f, -5.0f, 1.0f);
+	instances[7].position = XMFLOAT3(0.0f, -5.0f, 2.0f);
+	instances[8].position = XMFLOAT3(1.0f, -5.0f, -2.0f);
+	instances[9].position = XMFLOAT3(1.0f, -5.0f, 0.0f);*/
 
 
 	// Set up the description of the instance buffer.
@@ -228,6 +322,374 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
+bool ModelClass::InitializeBuffersBird(ID3D11Device* device)
+{
+	VertexType* vertices;
+	unsigned long* indices;
+	InstanceType* instances;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc, instanceBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
+	HRESULT result;
+	int i;
+
+	// Create the vertex array.
+	vertices = new VertexType[m_vertexCount];
+	if (!vertices)
+	{
+		return false;
+	}
+
+	// Create the index array.
+	indices = new unsigned long[m_indexCount];
+	if (!indices)
+	{
+		return false;
+	}
+
+	// Load the vertex array and index array with data.
+	for (i = 0; i < m_vertexCount; i++)
+	{
+		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z);
+		vertices[i].texture = XMFLOAT2(m_model[i].tu, m_model[i].tv);
+		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
+
+		indices[i] = i;
+	}
+
+	// Set up the description of the static vertex buffer.
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the vertex data.
+	vertexData.pSysMem = vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	// Now create the vertex buffer.
+	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Set up the description of the static index buffer.
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the index data.
+	indexData.pSysMem = indices;
+	indexData.SysMemPitch = 0;
+	indexData.SysMemSlicePitch = 0;
+
+	// Create the index buffer.
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	m_instanceCount = 3;
+	m_objCount += m_instanceCount;
+	instances = new InstanceType[m_instanceCount];
+	if (!instances)
+	{
+		return false;
+	}
+
+	instances[0].position = XMFLOAT3(2.0f, 50.0f, 5.0f);
+	instances[1].position = XMFLOAT3(0.0f, 50.0f, 12.0f);
+	instances[2].position = XMFLOAT3(-5.0f, 50.0f, -2.0f);
+	
+
+
+	// Set up the description of the instance buffer.
+	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instanceBufferDesc.CPUAccessFlags = 0;
+	instanceBufferDesc.MiscFlags = 0;
+	instanceBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the instance data.
+	instanceData.pSysMem = instances;
+	instanceData.SysMemPitch = 0;
+	instanceData.SysMemSlicePitch = 0;
+
+	result = device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Release the arrays now that the vertex and index buffers have been created and loaded.
+	delete[] vertices;
+	vertices = 0;
+
+	delete[] indices;
+	indices = 0;
+
+	delete[] instances;
+	instances = 0;
+
+	return true;
+}
+
+bool ModelClass::InitializeBuffersGround(ID3D11Device* device)
+{
+	VertexType* vertices;
+	unsigned long* indices;
+	InstanceType* instances;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc, instanceBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
+	HRESULT result;
+	int i;
+
+	// Create the vertex array.
+	vertices = new VertexType[m_vertexCount];
+	if (!vertices)
+	{
+		return false;
+	}
+
+	// Create the index array.
+	indices = new unsigned long[m_indexCount];
+	if (!indices)
+	{
+		return false;
+	}
+
+	// Load the vertex array and index array with data.
+	for (i = 0; i < m_vertexCount; i++)
+	{
+		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z);
+		vertices[i].texture = XMFLOAT2(m_model[i].tu, m_model[i].tv);
+		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
+
+		indices[i] = i;
+	}
+
+	// Set up the description of the static vertex buffer.
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the vertex data.
+	vertexData.pSysMem = vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	// Now create the vertex buffer.
+	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Set up the description of the static index buffer.
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the index data.
+	indexData.pSysMem = indices;
+	indexData.SysMemPitch = 0;
+	indexData.SysMemSlicePitch = 0;
+
+	// Create the index buffer.
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	m_instanceCount = 9;
+
+	instances = new InstanceType[m_instanceCount];
+	if (!instances)
+	{
+		return false;
+	}
+
+	instances[0].position = XMFLOAT3(4.0f, -5.0f, 0.0f);
+	instances[1].position = XMFLOAT3(162.0f, -5.0f, 144.0f);
+	instances[2].position = XMFLOAT3(4.0f, -5.0f, 144.0f);
+	instances[3].position = XMFLOAT3(-158.0f, -5.0f, 144.0f);
+	instances[4].position = XMFLOAT3(162.0f, -5.0f, -144.0f);
+	instances[5].position = XMFLOAT3(4.0f, -5.0f, -144.0f);
+	instances[6].position = XMFLOAT3(-158.0f, -5.0f, 0.0f);
+	instances[7].position = XMFLOAT3(162.0f, -5.0f, 0.0f);
+	instances[8].position = XMFLOAT3(-158.0f, -5.0f, -144.0f);
+	
+	
+	
+
+	
+
+
+	// Set up the description of the instance buffer.
+	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instanceBufferDesc.CPUAccessFlags = 0;
+	instanceBufferDesc.MiscFlags = 0;
+	instanceBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the instance data.
+	instanceData.pSysMem = instances;
+	instanceData.SysMemPitch = 0;
+	instanceData.SysMemSlicePitch = 0;
+
+	result = device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Release the arrays now that the vertex and index buffers have been created and loaded.
+	delete[] vertices;
+	vertices = 0;
+
+	delete[] indices;
+	indices = 0;
+
+	delete[] instances;
+	instances = 0;
+
+	return true;
+}
+
+bool ModelClass::InitializeBuffersLong(ID3D11Device* device)
+{
+	VertexType* vertices;
+	unsigned long* indices;
+	InstanceType* instances;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc, instanceBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
+	HRESULT result;
+	int i;
+
+	// Create the vertex array.
+	vertices = new VertexType[m_vertexCount];
+	if (!vertices)
+	{
+		return false;
+	}
+
+	// Create the index array.
+	indices = new unsigned long[m_indexCount];
+	if (!indices)
+	{
+		return false;
+	}
+
+	// Load the vertex array and index array with data.
+	for (i = 0; i < m_vertexCount; i++)
+	{
+		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z);
+		vertices[i].texture = XMFLOAT2(m_model[i].tu, m_model[i].tv);
+		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
+
+		indices[i] = i;
+	}
+
+	// Set up the description of the static vertex buffer.
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the vertex data.
+	vertexData.pSysMem = vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	// Now create the vertex buffer.
+	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Set up the description of the static index buffer.
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the index data.
+	indexData.pSysMem = indices;
+	indexData.SysMemPitch = 0;
+	indexData.SysMemSlicePitch = 0;
+
+	// Create the index buffer.
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	m_instanceCount = 2;
+
+	instances = new InstanceType[m_instanceCount];
+	if (!instances)
+	{
+		return false;
+	}
+
+	instances[0].position = XMFLOAT3(0.0f, -4.5f, -55.8f);
+	instances[1].position = XMFLOAT3(-3.0f, -5.0f, -1.0f);
+	
+
+
+	// Set up the description of the instance buffer.
+	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instanceBufferDesc.CPUAccessFlags = 0;
+	instanceBufferDesc.MiscFlags = 0;
+	instanceBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the instance data.
+	instanceData.pSysMem = instances;
+	instanceData.SysMemPitch = 0;
+	instanceData.SysMemSlicePitch = 0;
+
+	result = device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Release the arrays now that the vertex and index buffers have been created and loaded.
+	delete[] vertices;
+	vertices = 0;
+
+	delete[] indices;
+	indices = 0;
+
+	delete[] instances;
+	instances = 0;
+
+	return true;
+}
 
 void ModelClass::ShutdownBuffers()
 {

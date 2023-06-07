@@ -49,6 +49,7 @@ private:
 	void ShutdownWindows();
 
 private:
+	int screenWidth, screenHeight;
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;

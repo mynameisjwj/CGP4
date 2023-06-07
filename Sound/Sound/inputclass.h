@@ -36,8 +36,16 @@ public:
 
 	bool Initialize(HINSTANCE, HWND, int, int);
 	void Shutdown();
+	void KeyDown(unsigned int);
+	void KeyUp(unsigned int);
+	bool IsKeyDown(unsigned int);
 	bool Frame();
 	bool IsEscapePressed();
+	bool IsAPressed();
+	bool IsDPressed();
+	bool IsWPressed();
+	bool IsSPressed();
+	bool IsEnterPressed();
 	void GetMouseLocation(int&, int&);
 	DIMOUSESTATE m_mouseState;
 	DIMOUSESTATE mouseLastState;

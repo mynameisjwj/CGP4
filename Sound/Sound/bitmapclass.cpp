@@ -56,6 +56,40 @@ bool BitmapClass::Initialize(ID3D11Device* device, int screenWidth, int screenHe
 	return true;
 }
 
+bool BitmapClass::InitializeTitle(ID3D11Device* device, int screenWidth, int screenHeight, const WCHAR* textureFilename, int bitmapWidth, int bitmapHeight)
+{
+	bool result;
+
+
+	// Store the screen size.
+	m_screenWidth = screenWidth;
+	m_screenHeight = screenHeight;
+
+	// Store the size in pixels that this bitmap should be rendered at.
+	m_bitmapWidth = bitmapWidth;
+	m_bitmapHeight = bitmapHeight;
+
+	// Initialize the previous rendering position to negative one.
+	m_previousPosX = -1;
+	m_previousPosY = -1;
+
+	// Initialize the vertex and index buffers.
+	result = InitializeBuffers(device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Load the texture for this bitmap.
+	result = LoadTexture(device, textureFilename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 
 void BitmapClass::Shutdown()
 {
@@ -188,6 +222,7 @@ bool BitmapClass::InitializeBuffers(ID3D11Device* device)
 
 	return true;
 }
+
 
 
 void BitmapClass::ShutdownBuffers()
